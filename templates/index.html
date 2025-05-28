@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Prediction Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f7e0 0%, #a5d6a7 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 100, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid #e0f2e9;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2e7d32, #43a047);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 1px solid #e8f5e9;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin: 20px auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 100, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #e8f5e9;
+            max-width: 900px;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .parameters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .parameter-card {
+            background: #f1f8e9;
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid #e8f5e9;
+            transition: all 0.3s ease;
+        }
+
+        .parameter-card:hover {
+            border-color: #3498db;
+            transform: translateY(-2px);
+        }
+
+        .parameter-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .parameter-range {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .parameter-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .parameter-input:focus {
+            outline: none;
+            border-color: #43a047;
+            box-shadow: 0 0 10px rgba(67, 160, 71, 0.2);
+        }
+
+        .parameter-slider {
+            flex: 2;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            outline: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .parameter-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .parameter-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .predict-btn {
+            background: linear-gradient(135deg, #43a047, #2e7d32);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            display: block;
+            margin: 40px auto;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 5px 20px rgba(67, 160, 71, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(67, 160, 71, 0.4);
+        }
+
+        .predict-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result-card {
+            background: #f1f8e9;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px auto 0;
+            max-width: 600px;
+            transition: all 0.3s ease;
+            border: 1px solid #e8f5e9;
+        }
+
+        .result-card.positive {
+            border-color: #43a047;
+            background: linear-gradient(135deg, #e8f5e9, #ffffff);
+            color: #2e7d32;
+        }
+
+        .result-negative {
+            border-color: #e74c3c;
+            background: linear-gradient(135deg, #fdeaea, #ffffff);
+            color: #e74c3c;
+        }
+
+        .result-text {
+            font-size: 2em;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .confidence-text {
+            font-size: 1.2em;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .parameters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .predict-btn {
+                padding: 15px 30px;
+                font-size: 1.1em;
+            }
+        }
+
+        .parameter-value {
+            font-size: 0.9em;
+            color: #2e7d32;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 10px;
+            padding: 8px;
+            background: #e8f5e9;
+            border-radius: 5px;
+            border-left: 3px solid #43a047;
+        }
+        
+        .result-text {
+            font-size: 1.1em;
+            color: #2e7d32;
+            line-height: 1.6;
+        }
+
+        .error-input {
+            border-color: #e74c3c !important;
+            background-color: #fdf2f2 !important;
+        }
+
+        .success-input {
+            border-color: #27ae60 !important;
+            background-color: #f2fdf5 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Prediksi Risiko Diabetes</h1>
+            <p>Sistem prediksi berbasis Machine Learning dengan model Random Forest</p>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <div class="section-title">
+                    <div class="icon">⚙️</div>
+                    <span>Parameter Kesehatan</span>
+                </div>
+                <div id="parametersContainer" class="parameters-grid">
+                    <!-- Parameter inputs will be inserted here by JavaScript -->
+                </div>
+                
+                <button id="predictBtn" class="predict-btn" disabled>
+                    Loading Model...
+                </button>
+                
+                <div id="resultCard" class="result-card">
+                    <div class="result-text">Harap tunggu, memuat model...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        class MLPredictionApp {
+            constructor() {
+                this.model = { loaded: true, name: 'random_forest_model.joblib' };
+                // HAPUS: this.scaler = null;
+                this.parameters = {
+                    'Gender': { min: 0, max: 1, default: 0, step: 1, label: 'Gender (0=Female, 1=Male)' },
+                    'AGE': { min: 20, max: 79, default: 40, step: 1, label: 'Age (years)' },
+                    'Urea': { min: 0.5, max: 38.9, default: 15.0, step: 0.1, label: 'Urea (mmol/L)' },
+                    'Cr': { min: 6.0, max: 800.0, default: 80.0, step: 1, label: 'Creatinine (μmol/L)' },
+                    'HbA1c': { min: 0.9, max: 16.0, default: 5.5, step: 0.1, label: 'HbA1c (%)' },
+                    'Chol': { min: 0.0, max: 10.3, default: 5.0, step: 0.1, label: 'Total Cholesterol (mmol/L)' },
+                    'TG': { min: 0.6, max: 13.8, default: 1.5, step: 0.1, label: 'Triglycerides (mmol/L)' },
+                    'HDL': { min: 0.2, max: 9.9, default: 1.2, step: 0.1, label: 'HDL Cholesterol (mmol/L)' },
+                    'LDL': { min: 0.3, max: 9.9, default: 3.0, step: 0.1, label: 'LDL Cholesterol (mmol/L)' },
+                    'VLDL': { min: 0.2, max: 35.0, default: 1.5, step: 0.1, label: 'VLDL Cholesterol (mmol/L)' },
+                    'BMI': { min: 19.0, max: 47.75, default: 24.0, step: 0.1, label: 'Body Mass Index (kg/m²)' }
+                };
+                
+                this.initializeApp();
+            }
+
+            initializeApp() {
+                this.createParameterInputs();
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                document.getElementById('predictBtn').addEventListener('click', () => {
+                    this.predict();
+                });
+                
+                // Enable predict button since model is pre-loaded
+                document.getElementById('predictBtn').disabled = false;
+                document.getElementById('resultCard').innerHTML = 
+                    '<div class="result-text">🩺 Model siap! Sesuaikan parameter dan klik GET DIAGNOSIS</div>';
+            }
+
+            createParameterInputs() {
+                const container = document.getElementById('parametersContainer');
+                container.innerHTML = '';
+
+                Object.entries(this.parameters).forEach(([name, config]) => {
+                    const paramCard = document.createElement('div');
+                    paramCard.className = 'parameter-card';
+                    
+                    paramCard.innerHTML = `
+                        <div class="parameter-label">${config.label || name}</div>
+                        <div class="parameter-range">Range: ${config.min} - ${config.max}</div>
+                        <div class="input-group">
+                            <input 
+                                type="number" 
+                                id="input_${name}" 
+                                class="parameter-input" 
+                                value="${config.default}"
+                                min="${config.min}"
+                                max="${config.max}"
+                                step="${config.step}"
+                                placeholder="${config.default}"
+                            />
+                            <input 
+                                type="range" 
+                                id="slider_${name}" 
+                                class="parameter-slider" 
+                                value="${config.default}"
+                                min="${config.min}"
+                                max="${config.max}"
+                                step="${config.step}"
+                            />
+                        </div>
+                        <div class="parameter-value">Current: <span id="value_${name}">${config.default}</span></div>
+                    `;
+                    
+                    container.appendChild(paramCard);
+                    
+                    // Sync input and slider
+                    const input = document.getElementById(`input_${name}`);
+                    const slider = document.getElementById(`slider_${name}`);
+                    const valueDisplay = document.getElementById(`value_${name}`);
+                    
+                    input.addEventListener('input', () => {
+                        const value = parseFloat(input.value);
+                        if (value >= config.min && value <= config.max) {
+                            slider.value = value;
+                            valueDisplay.textContent = value;
+                            input.classList.remove('error-input');
+                            input.classList.add('success-input');
+                        } else {
+                            input.classList.add('error-input');
+                            input.classList.remove('success-input');
+                        }
+                    });
+                    
+                    slider.addEventListener('input', () => {
+                        const value = parseFloat(slider.value);
+                        input.value = value;
+                        valueDisplay.textContent = value;
+                        input.classList.remove('error-input');
+                        input.classList.add('success-input');
+                    });
+                });
+            }
+            validateInputs() {
+                const values = {};
+                let isValid = true;
+
+                Object.keys(this.parameters).forEach(name => {
+                    const input = document.getElementById(`input_${name}`);
+                    const value = parseFloat(input.value);
+                    const config = this.parameters[name];
+
+                    if (isNaN(value) || value < config.min || value > config.max) {
+                        input.classList.add('error-input');
+                        isValid = false;
+                    } else {
+                        input.classList.remove('error-input');
+                        input.classList.add('success-input');
+                        values[name] = value;
+                    }
+                });
+
+                return isValid ? values : null;
+            }
+            async predict() {
+                if (!this.model) {
+                    alert('Model not available. Please try refreshing the page.');
+                    return;
+                }
+
+                const values = this.validateInputs();
+                if (!values) {
+                    alert('Please check your input values. Make sure they are within the specified ranges.');
+                    return;
+                }
+
+                const predictBtn = document.getElementById('predictBtn');
+                const resultCard = document.getElementById('resultCard');
+
+                // Show loading state
+                predictBtn.innerHTML = '<div class="loading"></div> Predicting...';
+                predictBtn.disabled = true;
+                resultCard.className = 'result-card';
+                resultCard.innerHTML = '<div class="result-text">Memproses prediksi...</div>';
+
+                try {
+                    // Send request to Python backend
+                    const response = await fetch('http://localhost:5000/predict', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(values)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    console.log('Backend response:', result);
+                    
+                    this.displayResult(result.prediction, result.confidence);
+                    
+                } catch (error) {
+                    console.error('Prediction error:', error);
+                    
+                    // Fallback to local prediction if backend is unavailable
+                    console.log('Falling back to local prediction...');
+                    const riskScore = this.calculateRiskScore(values);
+                    const prediction = riskScore > 0.5 ? 1 : 0;
+                    const confidence = Math.abs(riskScore - 0.5) * 2;
+                    
+                    this.displayResult(prediction, confidence);
+                    
+                    // Show warning about fallback
+                    const warningDiv = document.createElement('div');
+                    warningDiv.style.cssText = 'margin-top: 10px; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; font-size: 0.9em; color: #856404;';
+                    warningDiv.innerHTML = '⚠️ Backend tidak tersedia';
+                    resultCard.appendChild(warningDiv);
+                    
+                } finally {
+                    predictBtn.innerHTML = 'GET DIAGNOSIS';
+                    predictBtn.disabled = false;
+                }
+            }
+
+            displayResult(prediction, confidence) {
+                const resultCard = document.getElementById('resultCard');
+                
+                if (prediction === 1) {
+                    resultCard.className = 'result-card result-negative pulse';
+                    resultCard.innerHTML = `
+                        <div>
+                            <div class="result-text">⚠️ TINGGI RISIKO DIABETES</div>
+                            <div class="confidence-text">${(confidence * 100).toFixed(1)}% confidence</div>
+                            <div style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;">
+                                Rekomendasi konsultasi medis lanjutan
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    resultCard.className = 'result-card result-positive pulse';
+                    resultCard.innerHTML = `
+                        <div>
+                            <div class="result-text">✅ RISIKO DIABETES RENDAH</div>    
+                            <div class="confidence-text">${(confidence * 100).toFixed(1)}% confidence</div>
+                            <div style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;">
+                                Lanjutkan pemantauan kesehatan yang teratur
+                            </div>
+                        </div>
+                    `;
+                }
+                // Remove pulse animation after 2 seconds
+                setTimeout(() => {
+                    resultCard.classList.remove('pulse');
+                }, 2000);
+            }
+        }
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new MLPredictionApp();
+        });
+    </script>
+</body>
+</html>
