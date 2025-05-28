@@ -111,3 +111,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Built with Flask and scikit-learn
 - Uses Bootstrap for responsive design
 - Model trained using SMOTE for handling class imbalance
+# flask_anywhere
