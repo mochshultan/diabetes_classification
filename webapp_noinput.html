@@ -88,68 +88,6 @@
             font-weight: bold;
         }
 
-        .model-loader {
-            text-align: center;
-        }
-
-        .file-input-wrapper {
-            position: relative;
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-
-        .file-input {
-            position: absolute;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-
-        .file-label {
-            background: linear-gradient(135deg, #43a047, #2e7d32);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-block;
-            font-weight: 600;
-            box-shadow: 0 5px 15px rgba(67, 160, 71, 0.3);
-        }
-
-        .file-label:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
-        }
-
-        .model-status {
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-            font-weight: 600;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .status-loading {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-
-        .status-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .status-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
         .parameters-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -372,44 +310,36 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🤖 SMOTE-Random Forest Diabetes Prediction Dashboard</h1>
+            <h1>🤖 Prediksi Risiko Diabetes</h1>
+            <p>Sistem prediksi berbasis Machine Learning dengan model Random Forest</p>
         </div>
-
+        
         <div class="content">
             <div class="section">
                 <div class="section-title">
                     <div class="icon">⚙️</div>
-                    Masukkan Parameter
+                    <span>Parameter Kesehatan</span>
                 </div>
                 <div id="parametersContainer" class="parameters-grid">
-                    <!-- Parameters will be added here dynamically -->
+                    <!-- Parameter inputs will be inserted here by JavaScript -->
                 </div>
-            </div>
-
-            <div class="section" style="text-align: center; max-width: 700px;">
-                <div class="section-title" style="justify-content: center;">
-                    <div class="icon">🩺</div>
-                    <div>Diabetes Diagnosis Prediction</div>
-                </div>
-                <div style="margin: 20px 0 30px; color: #2e7d32; font-size: 1.1em;">
-                    Tinjau parameter dan klik tombol di bawah untuk memulai prediksi
-                </div>
-                <button id="predictBtn" class="predict-btn">
-                    GET DIAGNOSIS
+                
+                <button id="predictBtn" class="predict-btn" disabled>
+                    Loading Model...
                 </button>
+                
                 <div id="resultCard" class="result-card">
-                    <div class="result-text">Masukkan parameter dan klik tombol di atas untuk memulai prediksi</div>
+                    <div class="result-text">Harap tunggu, memuat model...</div>
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
+    
     <script>
         class MLPredictionApp {
             constructor() {
                 this.model = { loaded: true, name: 'random_forest_model.joblib' };
-                this.scaler = null;
+                // HAPUS: this.scaler = null;
                 this.parameters = {
                     'Gender': { min: 0, max: 1, default: 0, step: 1, label: 'Gender (0=Female, 1=Male)' },
                     'AGE': { min: 20, max: 79, default: 40, step: 1, label: 'Age (years)' },
@@ -507,20 +437,6 @@
                     });
                 });
             }
-
-            // Model is now pre-loaded, no need for file upload
-            async loadModel() {
-                try {
-                    // In a real application, you would fetch the model from the server
-                    // For example: const response = await fetch('/random_forest_model.joblib');
-                    // For now, we'll just simulate that the model is loaded
-                    console.log('Model loaded successfully');
-                } catch (error) {
-                    console.error('Error loading model:', error);
-                    alert('Error loading the model. Please check the console for details.');
-                }
-            }
-
             validateInputs() {
                 const values = {};
                 let isValid = true;
@@ -542,7 +458,6 @@
 
                 return isValid ? values : null;
             }
-
             async predict() {
                 if (!this.model) {
                     alert('Model not available. Please try refreshing the page.');
@@ -632,7 +547,6 @@
                         </div>
                     `;
                 }
-
                 // Remove pulse animation after 2 seconds
                 setTimeout(() => {
                     resultCard.classList.remove('pulse');
